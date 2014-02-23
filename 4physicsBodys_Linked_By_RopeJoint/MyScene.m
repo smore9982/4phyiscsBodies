@@ -1,9 +1,11 @@
 //
 //  MyScene.m
 //  4physicsBodys_Linked_By_RopeJoint
-//
-//  Created by YG on 2/17/14.
-//  Copyright (c) 2014 YuryGitman. All rights reserved.
+//  Modified By : Sameer More
+//  Modified Can now pick up squares to move limbs or the entire body.
+//  Uses pin joint to attach arms to shoulders.
+//  Uses limit joint to attach left arm.
+//  Uses spring joing to attach right arm.
 //
 
 
@@ -112,26 +114,33 @@
 }
 
 -(void) spawnSquares{
+    //Left Leg
     _mySquare1 = [[SKSpriteNode alloc]initWithColor:[SKColor redColor] size:CGSizeMake(20, 20)];
     _mySquare3 =[[SKSpriteNode alloc]initWithColor:[SKColor redColor] size:CGSizeMake(20, 20)];
     _mySquare5 = [[SKSpriteNode alloc]initWithColor:[SKColor redColor] size:CGSizeMake(20, 20)];
     
+    //Right Leg
     _mySquare2 =[[SKSpriteNode alloc]initWithColor:[SKColor purpleColor] size:CGSizeMake(20, 20)];
     _mySquare4 =[[SKSpriteNode alloc]initWithColor:[SKColor purpleColor] size:CGSizeMake(20, 20)];
     _mySquare6 =[[SKSpriteNode alloc]initWithColor:[SKColor purpleColor] size:CGSizeMake(20, 20)];
     
+    //Torso
     _mySquare7 =[[SKSpriteNode alloc]initWithColor:[SKColor yellowColor] size:CGSizeMake(20, 20)];
     _mySquare8 =[[SKSpriteNode alloc]initWithColor:[SKColor yellowColor] size:CGSizeMake(20, 20)];
     
+    //Shoulders
     _mySquare9 = [[SKSpriteNode alloc]initWithColor:[SKColor blueColor] size:CGSizeMake(20, 20)];
     _mySquare10 =[[SKSpriteNode alloc]initWithColor:[SKColor blueColor] size:CGSizeMake(20, 20)];
     _mySquare11 =[[SKSpriteNode alloc]initWithColor:[SKColor blueColor] size:CGSizeMake(20, 20)];
     
+    //Head
     _mySquare12 =[[SKSpriteNode alloc]initWithColor:[SKColor greenColor] size:CGSizeMake(20, 20)];
     
-    
+    //Left hand
     _mySquare13 =[[SKSpriteNode alloc]initWithColor:[SKColor cyanColor] size:CGSizeMake(20, 20)];
     _mySquare15 =[[SKSpriteNode alloc]initWithColor:[SKColor cyanColor] size:CGSizeMake(20, 20)];
+    
+    //Right hand
     _mySquare14 = [[SKSpriteNode alloc]initWithColor:[SKColor whiteColor] size:CGSizeMake(20, 20)];
     _mySquare16 =[[SKSpriteNode alloc]initWithColor:[SKColor whiteColor] size:CGSizeMake(20, 20)];
     
@@ -187,8 +196,6 @@
     [self addChild:_mySquare14];
     [self addChild:_mySquare15];
     [self addChild:_mySquare16];
-    
-    
 }
 
 -(void)makeShelf{
@@ -212,9 +219,6 @@
     }
     return self;
 }
-
-
-
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     for (UITouch *touch in touches) {
@@ -245,11 +249,6 @@
     if (!_heldNode.physicsBody.dynamic) {
         [_heldNode.physicsBody setDynamic:YES];
     }
-}
-
-
--(void)update:(CFTimeInterval)currentTime {
-    
 }
 
 @end
