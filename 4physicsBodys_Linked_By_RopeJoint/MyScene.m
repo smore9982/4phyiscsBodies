@@ -46,6 +46,8 @@
 @property SKPhysicsJoint* myJoint17;
 @property SKPhysicsJoint* myJoint18;
 
+@property SKNode* heldNode;
+
 @end
 
 @implementation MyScene
@@ -66,8 +68,6 @@
     //Waist
     _myJoint5 = [SKPhysicsJointFixed jointWithBodyA:_mySquare5.physicsBody bodyB:_mySquare6.physicsBody anchor:CGPointMake(_mySquare5.position.x+10,_mySquare5.position.y)];
     [self.physicsWorld addJoint:_myJoint5];
-    //_myJoint6 = [SKPhysicsJointFixed jointWithBodyA:_mySquare5.physicsBody bodyB:_mySquare6.physicsBody anchor:CGPointMake(_mySquare5.position.x,_mySquare5.position.y)];
-    //[self.physicsWorld addJoint:_myJoint6];
     
     //Torso
     _myJoint7 = [SKPhysicsJointFixed jointWithBodyA:_mySquare7.physicsBody bodyB:_mySquare8.physicsBody anchor:CGPointMake(_mySquare7.position.x, _mySquare7.position.y+10)];
@@ -94,11 +94,11 @@
     [self.physicsWorld addJoint:_myJoint9];
     
     //Left Arm
-    _myJoint15 = [SKPhysicsJointFixed jointWithBodyA:_mySquare13.physicsBody bodyB:_mySquare15.physicsBody anchor:CGPointMake(_mySquare15.position.x,_mySquare15.position.y+10)];
+    _myJoint15 = [SKPhysicsJointLimit jointWithBodyA:_mySquare13.physicsBody bodyB:_mySquare15.physicsBody anchorA:CGPointMake(_mySquare13.position.x,_mySquare13.position.y) anchorB:CGPointMake(_mySquare15.position.x,_mySquare15.position.y)];
     [self.physicsWorld addJoint:_myJoint15];
     
     //Right Arm
-    _myJoint16 = [SKPhysicsJointFixed jointWithBodyA:_mySquare14.physicsBody bodyB:_mySquare16.physicsBody anchor:CGPointMake(_mySquare16.position.x,_mySquare16.position.y+10)];
+    _myJoint16 = [SKPhysicsJointSpring jointWithBodyA:_mySquare14.physicsBody bodyB:_mySquare16.physicsBody anchorA:CGPointMake(_mySquare14.position.x,_mySquare14.position.y) anchorB:CGPointMake(_mySquare16.position.x,_mySquare16.position.y)];
     [self.physicsWorld addJoint:_myJoint16];
     
     //Left Arm to Shoulder
@@ -106,7 +106,7 @@
     [self.physicsWorld addJoint:_myJoint17];
     
     //Right Arm to Shoulder
-    _myJoint18 = [SKPhysicsJointPin jointWithBodyA:_mySquare11.physicsBody bodyB:_mySquare14.physicsBody anchor:CGPointMake(_mySquare11.position.x-10,_mySquare11.position.y+10)];
+    _myJoint18 = [SKPhysicsJointPin jointWithBodyA:_mySquare11.physicsBody bodyB:_mySquare14.physicsBody anchor:CGPointMake(_mySquare11.position.x+10,_mySquare11.position.y-10)];
     [self.physicsWorld addJoint:_myJoint18];
     
 }
@@ -171,19 +171,6 @@
     _mySquare15.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_mySquare15.size];
     _mySquare16.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_mySquare16.size];
     
-    /*[_mySquare1.physicsBody setRestitution:1.0];
-    [_mySquare2.physicsBody setRestitution:1.0];
-    [_mySquare3.physicsBody setRestitution:1.0];
-    [_mySquare4.physicsBody setRestitution:1.0];
-    [_mySquare5.physicsBody setRestitution:1.0];
-    [_mySquare6.physicsBody setRestitution:1.0];
-    [_mySquare7.physicsBody setRestitution:1.0];
-    [_mySquare8.physicsBody setRestitution:1.0];
-    [_mySquare9.physicsBody setRestitution:1.0];
-    [_mySquare10.physicsBody setRestitution:1.0];
-    [_mySquare11.physicsBody setRestitution:1.0];
-    [_mySquare12.physicsBody setRestitution:1.0];*/
-    
     [self addChild:_mySquare1];
     [self addChild:_mySquare2];
     [self addChild:_mySquare3];
@@ -209,22 +196,16 @@
     _myShelf.position = CGPointMake(self.size.width/2.4, self.size.height/2);
     _myShelf.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_myShelf.size];
     [_myShelf.physicsBody setDynamic:NO];
-    
     [self addChild:_myShelf];
-    
 }
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
-        /* Setup your scene here */
-        
         self.scaleMode = SKSceneScaleModeAspectFit;
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
         [self.physicsBody setRestitution:0.0];
         
-        
         [self spawnSquares];
-        
         [self activateJointRope];
         [self makeShelf];
         
@@ -232,35 +213,37 @@
     return self;
 }
 
+
+
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    
-    if (_mySquare7.physicsBody.dynamic) {
-        [_mySquare7.physicsBody setDynamic:NO];
-    }
-    
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInNode:self];
-        [_mySquare7 setPosition:location];
+        _heldNode = [self nodeAtPoint:location];
+    }
+    
+    if (_heldNode.physicsBody.dynamic) {
+        [_heldNode.physicsBody setDynamic:NO];
     }
 }
 
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInNode:self];
-        [_mySquare7 setPosition:location];
+        [_heldNode setPosition:location];
         
     }
 }
 
 -(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event  {
-    if (!_mySquare7.physicsBody.dynamic) {
-        [_mySquare7.physicsBody setDynamic:YES];
+    if (!_heldNode.physicsBody.dynamic) {
+        [_heldNode.physicsBody setDynamic:YES];
     }
 }
 
 -(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event{
-    if (!_mySquare7.physicsBody.dynamic) {
-        [_mySquare7.physicsBody setDynamic:YES];
+    if (!_heldNode.physicsBody.dynamic) {
+        [_heldNode.physicsBody setDynamic:YES];
     }
 }
 
